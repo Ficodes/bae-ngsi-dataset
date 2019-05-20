@@ -1,0 +1,49 @@
+{
+    "name": "NGSI Dataset",
+    "author": "fdelavega",
+    "version": "0.1",
+    "module": "ngsi_dataset.NGSIDataset",
+    "media_types": [],
+    "formats": ["URL"],
+    "overrides": ["productSpecCharacteristics"],
+    "pull_accounting": true,
+    "form": {
+        "entities": {
+            "type": "text",
+            "label": "Entities",
+            "placeholder": "Vehicle,Parking",
+            "mandatory": true
+        },
+        "attrs": {
+            "type": "text",
+            "label": "Attributes",
+            "placeholder": "speed,temperature"
+        },
+        "expression": {
+            "type": "text",
+            "label": "Expression",
+            "placeholder": "q=speed>5"
+        },
+        "service": {
+            "type": "text",
+            "label": "FIWARE Service",
+            "placeholder": "tenant"
+        },
+        "service_path": {
+            "type": "text",
+            "label": "FIWARE Service Path",
+            "placeholder": "/path"
+        },
+        "role": {
+            "type": "text",
+            "label": "Acquisition Role",
+            "placeholder": "customer",
+            "mandatory": true
+        },
+        "ckan_url": {
+            "type": "text",
+            "label": "Data Portal URL",
+            "placeholder": "https://ckan.com/"
+        }
+    }
+}
