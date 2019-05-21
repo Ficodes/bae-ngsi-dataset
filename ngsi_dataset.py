@@ -19,10 +19,12 @@
 
 from __future__ import unicode_literals
 
+import requests
 from urlparse import urlparse
 
 from wstore.asset_manager.resource_plugins.plugin import Plugin
 from wstore.asset_manager.resource_plugins.plugin_error import PluginError
+from wstore.model import User
 
 from keyrock_client import KeyrockClient
 from umbrella_client import UmbrellaClient
@@ -36,10 +38,80 @@ class NGSIDataset(Plugin):
         super(NGSIDataset, self).__init__(plugin_model)
         self._units = UNITS
 
-    def create_dataset(self, data_info):
-        pass
+    def _get_access_token(self):
+        user = User.objects.get(name=self._user_id)
+        return user.userprofile.access_token
+
+    def create_dataset(self, product, data_url, data_info):
+        name = product['name'].lower().replace(' ', '-')
+        description = ''
+        if 'description' in product and product['description'] is not None:
+            description = product['description']
+
+        service = ''
+        if 'service' in data_info['service'] and data_info['service'] is not None:
+            service = data_info['service']
+
+        service_path = ''
+        if 'service_path' in data_info['service_path'] and data_info['service_path'] is not None:
+            service_path = data_info['service_path']
+
+        # Build URL query using data info
+        url = data_url
+        if not data_url.endswith('/'):
+            data_url = data_url + '/'
+
+        data_url = data_url + 'v2/entities'
+        query = ''
+
+        if 'entities' in data_info and data_info['entities'] is not None:
+            query = '?type=' + data_info['entities']
+
+        if 'attrs' in data_info and data_info['attrs'] is not None:
+            if query == '':
+                query = query + '?attrs=' + data_info['attrs']
+            else:
+                query = query + '&attrs=' + data_info['attrs']
+
+        if 'expression' in data_info and data_info['expression'] is not None:
+            if query == '':
+                query = query + '?' + data_info['expression']
+            else:
+                query = query + '&' + data_info['expression']
+
+        data_url = data_url + query
+
+        dataset_info = {
+	        "private": True,
+	        "acquire_url": "",
+	        "name": name,
+	        "title": product["name"],
+	        "notes": description,
+	        "isopen": True,
+            "searchable": "True",
+            "resources": [{
+                "auth_type": "oauth2",
+                "entity": [],
+                "format": "fiware-ngsi",
+                "name": "NGSI query",
+                "url": data_url,
+                "tenant": data_info['service'],
+                "service_path": data_info['service_path']
+            }]
+        }
+
+        resp = requests.post(ckan_url, json=dataset_info, headers={
+            'Authorization': 'Bearer ' + self._get_access_token()
+        })
+
+        if resp.status_code != 200:
+            raise PluginError('It had not being possible to create CKAN dataset')
+
+        return resp.json()['result']
 
     def on_post_product_spec_validation(self, provider, asset):
+        self._user_id = provider.name
+
         parsed_url = urlparse(asset.get_url())
 
         # Validate that the provided URL is a valid API in API Umbrella
@@ -53,16 +125,18 @@ class NGSIDataset(Plugin):
         # Check that the provided role is registered in the specified App
         keyrock_client.check_role(app_id, asset.meta_info['role'])
 
-        # If CKAN URL has been included register a new dataset
-        if 'ckan_url' in asset.meta_info and asset.meta_info['ckan_url'] is not None and asset.meta_info['ckan_url'] != '':
-            self.create_dataset(asset.meta_info)
-
         asset.meta_info['app_id'] = app_id
         asset.save()
 
     def on_post_product_spec_attachment(self, asset, asset_t, product_spec):
         # Include NGSI specific info as characteristics of the product
-        pass
+        # If CKAN URL has been included register a new dataset
+        if 'ckan_url' in asset.meta_info and asset.meta_info['ckan_url'] is not None and asset.meta_info['ckan_url'] != '':
+            dataset = self.create_dataset(product_spec, asset.get_url(), asset.meta_info)
+            asset.meta_info['dataset_id'] = dataset['id']
+            asset.save()
+
+        #self.update_product(product_spec, asset.meta_info)
 
     def on_post_product_offering_validation(self, asset, product_offering):
         # Validate that the pay-per-use model (if any) is supported by the backend
