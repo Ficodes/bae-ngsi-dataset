@@ -5,7 +5,7 @@
     "module": "ngsi_dataset.NGSIDataset",
     "media_types": [],
     "formats": ["URL"],
-    "overrides": ["productSpecCharacteristics"],
+    "overrides": [],
     "pull_accounting": true,
     "form": {
         "entities": {

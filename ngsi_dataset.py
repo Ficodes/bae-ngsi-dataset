@@ -177,30 +177,30 @@ class NGSIDataset(Plugin):
         if 'entities' in data_info and data_info['entities'] is not None:
             charact.append({
                 'configurable': False,
-                'description': 'NGSI Entities provided'
-                'name': 'Entities'
+                'description': 'NGSI Entities provided',
+                'name': 'Entities',
                 'productSpecCharacteristicValue': [{
-                    'value': data_info['entities'], 'unitOfMeasure': "", 'valueFrom': "", 'valueTo': "", 'default': True}]
+                    'value': data_info['entities'], 'unitOfMeasure': "", 'valueFrom': "", 'valueTo': "", 'default': True}],
                 'valueType': "string"
             })
 
         if 'attrs' in data_info and data_info['attrs'] is not None:
             charact.append({
                 'configurable': False,
-                'description': 'NGSI Atributtes provided'
-                'name': 'Attributes'
+                'description': 'NGSI Atributtes provided',
+                'name': 'Attributes',
                 'productSpecCharacteristicValue': [{
-                    'value': data_info['attrs'], 'unitOfMeasure': "", 'valueFrom': "", 'valueTo': "", 'default': True}]
-                'valueType': "string"
+                    'value': data_info['attrs'], 'unitOfMeasure': "", 'valueFrom': "", 'valueTo': "", 'default': True}],
+                'valueType': "string",
             })
 
         if 'expression' in data_info and data_info['expression'] is not None:
             charact.append({
                 'configurable': False,
-                'description': 'NGSI Expression'
-                'name': 'Expression'
+                'description': 'NGSI Expression',
+                'name': 'Expression',
                 'productSpecCharacteristicValue': [{
-                    'value': data_info['expression'], 'unitOfMeasure': "", 'valueFrom': "", 'valueTo': "", 'default': True}]
+                    'value': data_info['expression'], 'unitOfMeasure': "", 'valueFrom': "", 'valueTo': "", 'default': True}],
                 'valueType': "string"
             })
 
