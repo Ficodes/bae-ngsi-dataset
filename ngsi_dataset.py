@@ -26,7 +26,7 @@ from django.conf import settings as django_settings
 
 from wstore.asset_manager.resource_plugins.plugin import Plugin
 from wstore.asset_manager.resource_plugins.plugin_error import PluginError
-from wstore.model import User
+from wstore.models import User
 
 from keyrock_client import KeyrockClient
 from umbrella_client import UmbrellaClient
