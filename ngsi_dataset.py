@@ -267,7 +267,7 @@ class NGSIDataset(Plugin):
 
         # Activate API resources
         client = KeyrockClient()
-        client.grant_permission(order.customer, asset.meta_info['role'])
+        client.grant_permission(asset.meta_info['app_id'], order.customer, asset.meta_info['role'])
 
         if 'dataset_id' in asset.meta_info:
             # User need to be included in the authorized users list of the dataset
@@ -279,7 +279,7 @@ class NGSIDataset(Plugin):
 
         # Suspend API Resources
         client = KeyrockClient()
-        client.revoke_permission(order.customer, asset.meta_info['role'])
+        client.revoke_permission(asset.meta_info['app_id'], order.customer, asset.meta_info['role'])
 
     def get_usage_specs(self):
         return self._units
